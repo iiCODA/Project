@@ -24,7 +24,9 @@ class UserController extends Controller
         if ($user) {
             return response()->json($user);
         } else {
-            return response()->json(['message' => 'User not found'], 404);
+            $statusCode = 404;
+            return response()->json(['message' => 'User not found',
+            '$status_code'=>$statusCode], $statusCode);
         }
     }
     
@@ -101,7 +103,9 @@ class UserController extends Controller
     $user = $request->user();
 
     if (!$user) {
-        return response()->json(['message' => 'User not found'], 404);
+        $statusCode = 404;
+        return response()->json(['message' => 'User not found',
+        '$status_code'=>$statusCode], $statusCode);
     }
 
     // Delete the user's profile photo if it exists
@@ -128,7 +132,9 @@ class UserController extends Controller
     $user = User::where('phone', $request->phone)->first();
 
     if (!$user) {
-        return response()->json(['message' => 'User not found'], 404);
+        $statusCode = 404;
+        return response()->json(['message' => 'User not found',
+                                'status_code'=>$statusCode], $statusCode);
     }
 
     $token = $user->createToken('auth_token')->plainTextToken;

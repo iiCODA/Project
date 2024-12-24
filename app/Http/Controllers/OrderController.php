@@ -25,9 +25,10 @@ class OrderController extends Controller
 
     // Check if there is enough stock for the requested quantity
     if ($product->quantity < $request->quantity) {
+        $statusCode = 400;
         return response()->json([
             'message' => "Insufficient stock for product: {$product->name}",
-        ], 400);
+            '$status_code'=>$statusCode], $statusCode);
     }
 
     // Create the order
@@ -74,7 +75,8 @@ public function submitCart(Request $request)
 
     // Ensure cartItems is not null
     if (!$cartItems || $cartItems->isEmpty()) {
-        return response()->json(['message' => 'Your cart is empty'], 400);
+        $statusCode = 400;
+        return response()->json(['message' => 'Your cart is empty', '$status_code'=>$statusCode], $statusCode);
     }
 
     // Initialize total price to 0
@@ -99,9 +101,10 @@ public function submitCart(Request $request)
     foreach ($cartItems as $cartItem) {
         // Check product stock
         if ($cartItem->product->quantity < $cartItem->quantity) {
+            statusCode = 400;
             return response()->json([
                 'message' => 'Not enough stock for product: ' . $cartItem->product->name,
-            ], 400);
+            ,  '$status_code'=>$statusCode], $statusCode);
         }
 
         // Create an order item
@@ -144,7 +147,8 @@ public function index(Request $request)
 
         // If the user has no orders
         if ($orders->isEmpty()) {
-            return response()->json(['message' => 'No orders found'], 404);
+            $statusCode = 404;
+            return response()->json(['message' => 'No orders found',   '$status_code'=>$statusCode], $statusCode);
         }
 
         return response()->json($orders);
@@ -214,7 +218,8 @@ public function updateOrder(Request $request, $orderId)
             $stockAdjustment = $item['quantity'] - $orderItem->quantity;
 
             if ($product->quantity < $stockAdjustment) {
-                return response()->json(['message' => "Not enough stock for product: {$product->name}"], 400);
+                $statusCode = 400;
+                return response()->json(['message' => "Not enough stock for product: {$product->name}",'$status_code'=>$statusCode], $statusCode);
             }
 
             $orderItem->update(['quantity' => $item['quantity']]);
@@ -224,7 +229,8 @@ public function updateOrder(Request $request, $orderId)
         } else {
             // Add a new product to the order
             if ($product->quantity < $item['quantity']) {
-                return response()->json(['message' => "Not enough stock for product: {$product->name}"], 400);
+                $statusCode = 400;
+                return response()->json(['message' => "Not enough stock for product: {$product->name}",'$status_code'=>$statusCode], $statusCode);
             }
 
             $order->orderItems()->create([

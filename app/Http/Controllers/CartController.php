@@ -14,9 +14,12 @@ class CartController extends Controller
         $cart = Cart::where('user_id', $request->user()->id)->with('items.product')->first();
 
         if (!$cart) {
-            return response()->json(['message' => 'Cart is empty'], 200);
+            $statusCode = 404;
+            return response()->json(
+                ['message' => 'Cart is empty',
+                 '$status_code'=>$statusCode], $statusCode);
         }
-//ukgyui
+
         return response()->json($cart);
     }
 
@@ -58,7 +61,8 @@ class CartController extends Controller
         $cartItem = CartItem::find($cartItemId);
 
         if (!$cartItem || $cartItem->cart->user_id !== $request->user()->id) {
-            return response()->json(['message' => 'Unauthorized'], 403);
+            $statusCode = 403;
+            return response()->json(['message' => 'Unauthorized','$status_code'=>$statusCode], $statusCode););
         }
 
         $cartItem->update(['quantity' => $request->quantity]);
@@ -72,7 +76,8 @@ class CartController extends Controller
     $cartItem = CartItem::find($cartItemId);
 
     if (!$cartItem || $cartItem->cart->user_id !== $request->user()->id) {
-        return response()->json(['message' => 'Unauthorized'], 403);
+        $statusCode = 403;
+        return response()->json(['message' => 'Unauthorized', '$status_code'=>$statusCode], $statusCode);
     }
 
     // Decrement the number of items in the cart

@@ -11,7 +11,9 @@ class ShopController extends Controller
         $shop = $request->user()->shop;
 
         if (!$shop) {
-            return response()->json(['message' => 'Shop not found'], 404);
+            $statusCode = 404;
+            return response()->json(['message' => 'Shop not found',
+            '$status_code'=>$statusCode], $statusCode);
         }
 
         return response()->json($shop);
@@ -27,7 +29,9 @@ class ShopController extends Controller
         $user = $request->user();
 
         if ($user->shop) {
-            return response()->json(['message' => 'User already has a shop'], 400);
+            $statusCode = 400;
+            return response()->json(['message' => 'User already has a shop',
+            '$status_code'=>$statusCode], $statusCode);
         }
 
         $shop = $user->shop()->create($request->only(['name', 'location']));
@@ -40,7 +44,9 @@ class ShopController extends Controller
         $shop = $request->user()->shop;
 
         if (!$shop) {
-            return response()->json(['message' => 'Shop not found'], 404);
+            $statusCode = 404;
+            return response()->json(['message' => 'Shop not found',
+            '$status_code'=>$statusCode], $statusCode);
         }
 
         $request->validate([
@@ -58,7 +64,9 @@ class ShopController extends Controller
         $shop = $request->user()->shop;
 
         if (!$shop) {
-            return response()->json(['message' => 'Shop not found'], 404);
+            $statusCode = 404;
+            return response()->json(['message' => 'Shop not found',
+            '$status_code'=>$statusCode], $statusCode);
         }
 
         $shop->delete();
@@ -79,7 +87,9 @@ public function show_with_products($id)
     $shop = Shop::with('products')->find($id);
 
     if (!$shop) {
-        return response()->json(['message' => 'Shop not found'], 404);
+        $statusCode = 404;
+        return response()->json(['message' => 'Shop not found',
+        '$status_code'=>$statusCode], $statusCode);
     }
 
     return response()->json([
