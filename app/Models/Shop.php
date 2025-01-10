@@ -5,7 +5,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Shop extends Model
 {
-    protected $fillable = ['name', 'location', 'user_id'];
+    protected $fillable = ['name', 'location', 'user_id','shop_photo'];
 
     public function user()
     {

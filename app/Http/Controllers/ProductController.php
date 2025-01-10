@@ -4,17 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
-    // Show all products
     public function index()
     {
         $products = Product::all();
         return response()->json($products);
     }   
 
-    // Add a new product to the authenticated user's shop
     public function store(Request $request)
     {
         $request->validate([
@@ -22,7 +21,7 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'quantity' => 'required|integer|min:1',
             'price' => 'required|numeric|min:0',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Validate image
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', 
         ]);
     
         $shop = $request->user()->shop;
@@ -34,9 +33,8 @@ class ProductController extends Controller
     
         $data = $request->only(['name', 'description', 'quantity', 'price']);
     
-        // Handle photo upload
         if ($request->hasFile('photo')) {
-            $filePath = $request->file('photo')->store('products', 'public'); // Store in 'storage/app/public/products'
+            $filePath = $request->file('photo')->store('products', 'public'); 
             $data['photo'] = $filePath;
         }
     
@@ -46,14 +44,14 @@ class ProductController extends Controller
     }
     
 
-    // Show all products for the authenticated user's shop
     public function myProducts(Request $request)
     {
          $shop = $request->user()->shop;
 
           if (!$shop) {
             $statusCode = 403;
-              return response()->json(['message' => 'You do not own a shop','$status_code'=>$statusCode], $statusCode);         }
+              return response()->json(['message' => 'You do not own a shop','$status_code'=>$statusCode], $statusCode);   
+                  }
 
          $products = $shop->products;
 
@@ -62,7 +60,6 @@ class ProductController extends Controller
 
 
 
-    // Update a product in the authenticated user's shop
     public function update(Request $request, $id)
     {
         $product = Product::find($id);
@@ -84,13 +81,16 @@ class ProductController extends Controller
             'description' => 'string',
             'quantity' => 'integer|min:0',
             'price' => 'numeric|min:0',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Validate image
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', 
         ]);
     
         $data = $request->only(['name', 'description', 'quantity', 'price']);
     
-        // Handle photo upload
+        $photo = $product->photo;
         if ($request->hasFile('photo')) {
+            if($photo){
+                Storage::disk('public')->delete($photo);
+            }
             $filePath = $request->file('photo')->store('products', 'public');
             $data['photo'] = $filePath;
         }
@@ -105,7 +105,6 @@ class ProductController extends Controller
 
 
 
-   // Delete a product in the authenticated user's shop
     public function destroy(Request $request, $id)
     {
     $product = Product::find($id);
@@ -116,7 +115,6 @@ class ProductController extends Controller
         '$status_code'=>$statusCode], $statusCode);
     }
 
-    // Check if the product belongs to the authenticated user's shop
     if ($product->shop_id !== $request->user()->shop->id) {
         $statusCode = 403;
         return response()->json(['message' => 'Unauthorized',

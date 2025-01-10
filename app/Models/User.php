@@ -17,29 +17,32 @@ class User extends Authenticatable
         'phone',
         'first_name',
         'last_name',
+        'user_type',
         'location', 
         'profile_photo',  
     ];
 
-    // Automatically create a cart when a user is created
     protected static function boot()
     {
         parent::boot();
 
         static::created(function ($user) {
-            $user->cart()->create(); // Create a cart for the user
+            $user->cart()->create(); 
         });
     }
 
-    // Relationship with Shop
     public function shop()
     {
         return $this->hasOne(Shop::class);
     }
 
-    // Relationship with Cart
     public function cart()
     {
         return $this->hasOne(Cart::class);
+    }
+
+    public function favorites()
+    {
+        return $this->belongsToMany(Product::class, 'favorites', 'user_id', 'product_id')->withTimestamps();
     }
 }

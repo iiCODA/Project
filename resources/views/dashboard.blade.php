@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Responsive Table</title>
+    <title>Owner's Dashboard</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -223,9 +223,7 @@
                 @foreach ($adminUsers as $user)
                     <tr>
                         <td>{{ $user->id }}</td>
-                        <td>{{ $user->first_name }}</td>
                         <td>{{ $user->phone }}</td>
-                        <td>{{ $user->user_type }}</td>
                         <td>
                             <!-- Actions for promoting/unpromoting -->
 
@@ -238,7 +236,7 @@
                 @endforeach
             </tbody>
         </table>
-        <h2>Promote Users</h2>
+        <h2>Promote/Unpromote Users</h2>
         <form action="{{ route('promote') }}" method="POST">
             @csrf
             <label for="phone">Enter User's Phone Number to Promote:</label>

@@ -11,8 +11,8 @@ class OrderNotification extends Notification
 {
     use Queueable;
 
-    protected $action; // Action type (placed, updated, or deleted)
-    protected $order;  // Order instance
+    protected $action; 
+    protected $order;  
 
     public function __construct($action, $order)
     {
@@ -22,7 +22,7 @@ class OrderNotification extends Notification
 
     public function via($notifiable)
     {
-        return ['database']; // Save to database
+        return ['database']; 
     }
 
     public function toArray($notifiable)

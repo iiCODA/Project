@@ -9,25 +9,29 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\NotificationController;
-//user routes:
+use App\Http\Controllers\FavoriteController;
 
-// Routes for listing and viewing users
+
+
+use App\Http\Middleware\AdminMiddleware;
+
+
+
 Route::get('/allusers', [UserController::class, 'index']);
 Route::get('/users', [UserController::class, 'show'])->middleware('auth:sanctum');
 
-// Routes for creating users (No authentication needed for creating new users)
 Route::post('/users', [UserController::class, 'store']);
 
-// Protect routes that modify user data
+
 Route::middleware('auth:sanctum')->group(function () {
-    Route::put('/users', [UserController::class, 'update'])->middleware('auth:sanctum');
-    // Ensure user can only update their own data
+    Route::post('/usersEdit', [UserController::class, 'update'])->middleware('auth:sanctum');
+
     
     Route::delete('/users', [UserController::class, 'destroy'])->middleware('auth:sanctum');
 
 });
 
-// Login and logout routes
+
 Route::post('/login', [UserController::class, 'login']);
 Route::post('/logout', [UserController::class, 'logout'])->middleware('auth:sanctum');
 
@@ -37,18 +41,17 @@ Route::post('/logout', [UserController::class, 'logout'])->middleware('auth:sanc
 Route::get('/shops', [ShopController::class, 'index']);
 Route::get('/shops/{id}', [ShopController::class, 'show_with_products']);
 
-Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/shop', [ShopController::class, 'show']); // Show logged-in user's shop
-    Route::post('/shop', [ShopController::class, 'store']); // Create a shop
-    Route::put('/shop', [ShopController::class, 'update']); // Update a shop
-    Route::delete('/shop', [ShopController::class, 'destroy']); // Delete a shop
+Route::middleware('auth:sanctum',AdminMiddleware::class)->group(function () {
+    Route::get('/shop', [ShopController::class, 'show']); 
+    Route::post('/shop', [ShopController::class, 'store']); 
+    Route::post('/shopEdit', [ShopController::class, 'update']);
+    Route::delete('/shop', [ShopController::class, 'destroy']); 
 });
 
-//search bar for the products and the shops
 Route::post('/search', [ShopController::class, 'search']);
 
 
-//products routes 
+ 
  
 
 Route::get('/products', [ProductController::class, 'index']);
@@ -58,39 +61,43 @@ Route::get('/products/{id}', [ProductController::class, 'show']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/products', [ProductController::class, 'store']);
     Route::get('/my-products', [ProductController::class, 'myProducts']);
-    Route::put('/products/{id}', [ProductController::class, 'update']);
+    Route::post('/products/{id}', [ProductController::class, 'update']);
     Route::delete('/products/{id}', [ProductController::class, 'destroy']);
 
 });
 
-//cart routes
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/cart', [CartController::class, 'index']); // View cart
-    Route::post('/cart', [CartController::class, 'add']); // Add product to cart
-    Route::put('/cart/{cartItemId}', [CartController::class, 'update']); // Update product quantity
-    Route::delete('/cart/{cartItemId}', [CartController::class, 'delete']); // Delete product from cart
+    Route::get('/cart', [CartController::class, 'index']); 
+    Route::post('/cart', [CartController::class, 'add']); 
+    Route::put('/cart/{cartItemId}', [CartController::class, 'update']); 
+    Route::delete('/cart/{cartItemId}', [CartController::class, 'delete']); 
 });
 
 
-//order controller
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/orders', [OrderController::class, 'createOrder']);
     Route::post('/orders/submit-cart', [OrderController::class, 'submitCart']);
     
-    // Add the route to view all orders for the authenticated user
-    Route::get('/orders', [OrderController::class, 'index']);  // This fetches all orders
+    Route::get('/orders', [OrderController::class, 'index']); 
     Route::put('/orders/{orderId}', [OrderController::class, 'updateOrder']);
     Route::delete('/orders/{orderId}', [OrderController::class, 'deleteOrder']);
 
 });
 
 
-//notification controller
 
 
 Route::middleware('auth:sanctum')->prefix('notifications')->group(function () {
-    Route::get('/', [NotificationController::class, 'getNotifications']); // Fetch all notifications
-    Route::post('/mark-as-read/{id}', [NotificationController::class, 'markAsRead']); // Mark notifications as read
-    Route::delete('/{id}', [NotificationController::class, 'deleteNotification']); // Delete a specific notification
+    Route::get('/', [NotificationController::class, 'getNotifications']);
+    Route::post('/mark-as-read/{id}', [NotificationController::class, 'markAsRead']); 
+    Route::delete('/{id}', [NotificationController::class, 'deleteNotification']); 
+});
+
+
+//favorates
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/favorites/{productId}', [FavoriteController::class, 'addFavorite']); 
+    Route::delete('/favorites/{productId}', [FavoriteController::class, 'removeFavorite']); 
+    Route::get('/favorites', [FavoriteController::class, 'getFavorites']);
 });
 

@@ -8,7 +8,7 @@ class Cart extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'number_of_items']; // Add 'number_of_items' to the fillable array
+    protected $fillable = ['user_id', 'number_of_items']; 
 
     public function user()
     {
