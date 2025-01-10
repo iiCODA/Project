@@ -4,7 +4,6 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class EnsureOwner
@@ -18,14 +17,19 @@ class EnsureOwner
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!Auth::check()) {
-            return redirect('/login')->with('error', 'Please log in to access this page.');
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'Please login to access this page.',
+            ], 401); 
         }
 
-        if (Auth::user()->user_type !== 'owner') {
-            return redirect('/login')->with('error', 'hahaha.');
-        }
+        if ($user->user_type !== 'owner') {
+            return response()->json([
+                'message' => 'You do not have permission to access this page.',
+            ], 403); 
 
         return $next($request);
-}
+    }
 }

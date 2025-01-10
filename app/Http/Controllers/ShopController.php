@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\Shop;
 use Illuminate\Http\Request;
@@ -9,18 +10,7 @@ use Illuminate\Support\Facades\Storage;
 
 class ShopController extends Controller
 {
-    public function show(Request $request)
-    {
-        $shop = $request->user()->shop;
-
-        if (!$shop) {
-            $statusCode = 404;
-            return response()->json(['message' => 'Shop not found', 'status_code' => $statusCode], $statusCode);
-        }
-
-        return response()->json($shop);
-    }
-
+   
     public function store(Request $request)
     {
         $request->validate([
@@ -132,5 +122,39 @@ class ShopController extends Controller
             'products' => $products,
         ]);
     }
+
+
+    public function showorders(Request $request)
+    {
+        $shop = $request->user()->shop;
+    
+        $orderItems = OrderItem::whereHas('product.shop', function ($query) use ($shop) {
+            $query->where('id', $shop->id);
+        })->get();
+    
+        $orders = [];
+        foreach ($orderItems as $orderItem) {
+            $orderId = $orderItem->order_id;
+            if (!isset($orders[$orderId])) {
+                $orders[$orderId] = [
+                    'order_id' => $orderId,
+                    'order_date' => $orderItem->order->created_at->toDateTimeString(), 
+                    'items' => [],
+                ];
+            }
+            $orders[$orderId]['items'][] = [
+                'order_item_id' => $orderItem->id,
+                'product_id' => $orderItem->product_id,
+                'product_name' => $orderItem->product->name,
+                'quantity' => $orderItem->quantity,
+                'price' => $orderItem->price,
+            ];
+        }
+    
+        return response()->json(array_values($orders));
+
+    }
+
+
 }
     

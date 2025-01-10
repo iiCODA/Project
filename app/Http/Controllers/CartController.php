@@ -59,7 +59,7 @@ class CartController extends Controller
 
         if (!$cartItem || $cartItem->cart->user_id !== $request->user()->id) {
             $statusCode = 403;
-            return response()->json(['message' => 'Unauthorized','$status_code'=>$statusCode], $statusCode););
+            return response()->json(['message' => 'Unauthorized','$status_code'=>$statusCode], $statusCode);
         }
 
         $cartItem->update(['quantity' => $request->quantity]);

@@ -8,9 +8,11 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use App\Notifications\OrderNotification;
 use Illuminate\Support\Facades\Notification;
+use App\Jobs\UpdateOrderStatus;
 
 class OrderController extends Controller
 {
+
     public function createOrder(Request $request)
     {
         $user = $request->user();
@@ -18,7 +20,7 @@ class OrderController extends Controller
         $request->validate([
             'product_id' => 'required|exists:products,id',
             'quantity' => 'required|integer|min:1',
-        ]);sssss
+        ]);
 
         $product = Product::find($request->product_id);
 
@@ -31,7 +33,11 @@ class OrderController extends Controller
         $order = Order::create([
             'user_id' => $user->id,
             'total_price' => $product->price * $request->quantity,
+            'status' => 'pending',
         ]);
+    
+        // Dispatch the status update job
+        UpdateOrderStatus::dispatch($order)->delay(now()->addMinute());
 
         OrderItem::create([
             'order_id' => $order->id,
@@ -80,7 +86,11 @@ class OrderController extends Controller
         $order = Order::create([
             'user_id' => $user->id,
             'total_price' => $totalPrice,
+            'status' => 'pending',
         ]);
+    
+        // Dispatch the status update job
+        UpdateOrderStatus::dispatch($order)->delay(now()->addMinute());
 
         foreach ($cartItems as $cartItem) {
             OrderItem::create([
@@ -117,10 +127,17 @@ class OrderController extends Controller
         return response()->json($orders);
     }
 
+
     public function deleteOrder(Request $request, $orderId)
     {
         $user = $request->user();
         $order = Order::where('user_id', $user->id)->findOrFail($orderId);
+        
+        if($order->status !== 'pending'){
+            return response()->json(['message' => 'Sorry, You can not cancel your order, It is too late!']);
+
+        }
+
 
         foreach ($order->orderItems as $orderItem) {
             $orderItem->product->increment('quantity', $orderItem->quantity);
@@ -145,6 +162,13 @@ class OrderController extends Controller
         ]);
 
         $order = Order::where('user_id', $user->id)->findOrFail($orderId);
+
+           if (!in_array($order->status, ['pending', 'preparing'])) {
+            
+            return response()->json(['message' => 'Sorry, You can not edit your order, It is too late!'],403);
+
+        }
+
         $totalPrice = 0;
 
         foreach ($request->items as $item) {
