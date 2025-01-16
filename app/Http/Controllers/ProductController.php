@@ -28,7 +28,7 @@ class ProductController extends Controller
     
         if (!$shop) {
             $statusCode = 403;
-            return response()->json(['message' => 'You do not own a shop','$status_code'=>$statusCode], $statusCode);
+            return response()->json(['message' => 'You do not own a shop','status_code'=>$statusCode], $statusCode);
         }
     
         $data = $request->only(['name', 'description', 'quantity', 'price']);
@@ -50,7 +50,7 @@ class ProductController extends Controller
 
           if (!$shop) {
             $statusCode = 403;
-              return response()->json(['message' => 'You do not own a shop','$status_code'=>$statusCode], $statusCode);   
+              return response()->json(['message' => 'You do not own a shop','status_code'=>$statusCode], $statusCode);   
                   }
 
          $products = $shop->products;
@@ -67,13 +67,13 @@ class ProductController extends Controller
         if (!$product) {
             $statusCode = 404;
             return response()->json(['message' => 'Product not found',
-            '$status_code'=>$statusCode], $statusCode);
+            'status_code'=>$statusCode], $statusCode);
         }
     
         if ($product->shop_id !== $request->user()->shop->id) {
             $statusCode = 403;
             return response()->json(['message' => 'Unauthorized',
-            '$status_code'=>$statusCode], $statusCode);
+            'status_code'=>$statusCode], $statusCode);
         }
     
         $request->validate([

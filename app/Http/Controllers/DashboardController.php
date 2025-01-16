@@ -19,13 +19,14 @@ class DashboardController extends Controller
         $user = User::where('phone', $request->phone)->first();
     
         if (!$user) {
-            return response()->json(['error' => 'User not found.'], 404);
+            $statusCode = 404;
+            return response()->json(['error' => 'User not found.', 'status_code'=>$statusCode], $statusCode);
         }
     
         if ($user->user_type !== 'owner') {
             return response()->json([
                 'message' => 'You do not have permission to access this page.',
-            ], 403); 
+           , 'status_code'=>$statusCode], $statusCode);
         }
 
         $token = $user->createToken('auth_token')->plainTextToken;

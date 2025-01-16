@@ -16,7 +16,7 @@ class CartController extends Controller
             $statusCode = 404;
             return response()->json(
                 ['message' => 'Cart is empty',
-                 '$status_code'=>$statusCode], $statusCode);
+                 'status_code'=>$statusCode], $statusCode);
         }
 
         return response()->json($cart);
@@ -32,12 +32,11 @@ class CartController extends Controller
 
     $cart = Cart::firstOrCreate(['user_id' => $request->user()->id]);
 
-    $cartItem = CartItem::updateOrCreate(
+    $cartItem = CartItem::Create(
         [
             'cart_id' => $cart->id,
             'product_id' => $request->product_id,
-        ],
-        [
+        
             'quantity' => $request->quantity,
         ]
     );
@@ -57,9 +56,9 @@ class CartController extends Controller
 
         $cartItem = CartItem::find($cartItemId);
 
-        if (!$cartItem || $cartItem->cart->user_id !== $request->user()->id) {
+        if (!$cartItem || $cartItem->cart->user->id !== $request->user()->id) {
             $statusCode = 403;
-            return response()->json(['message' => 'Unauthorized','$status_code'=>$statusCode], $statusCode);
+            return response()->json(['message' => 'Unauthorized','status_code'=>$statusCode], $statusCode);
         }
 
         $cartItem->update(['quantity' => $request->quantity]);
@@ -73,7 +72,7 @@ class CartController extends Controller
 
     if (!$cartItem || $cartItem->cart->user_id !== $request->user()->id) {
         $statusCode = 403;
-        return response()->json(['message' => 'Unauthorized', '$status_code'=>$statusCode], $statusCode);
+        return response()->json(['message' => 'Unauthorized', 'status_code'=>$statusCode], $statusCode);
     }
 
     $cartItem->cart->decrement('number_of_items', 1);
