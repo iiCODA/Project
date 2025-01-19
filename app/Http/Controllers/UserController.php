@@ -34,17 +34,30 @@ class UserController extends Controller
     public function store(Request $request)
 {
     $request->validate([
-        'phone' => 'required|unique:users,phone',
+       'phone' => [
+        'required',
+        'string',
+        'regex:/^\+?[0-9]{8,11}$/'
+    ],
+    ]);
+
+    if (User::where('phone', $request->phone)->exists()) {
+        $statusCode = 422;
+        return response()->json(['message' => 'The phone number is already taken.'
+        , 'status_code'=>$statusCode], $statusCode);
+    }
+
+    $request->validate([
         'first_name' => 'nullable|string',
         'last_name' => 'nullable|string',
-        'user_type' => 'nullable|string',  
+        'user_type' => 'nullable|string',
         'location' => 'nullable|string',
         'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
     ]);
 
     $profilePhoto = null;
     if ($request->hasFile('profile_photo')) {
-        $profilePhoto = $request->file('profile_photo')->store('profile_photos', 'public');  // Store the photo in the public disk
+        $profilePhoto = $request->file('profile_photo')->store('profile_photos', 'public');
     }
 
     $userType = $request->user_type ?? 'user';
@@ -66,9 +79,23 @@ public function update(Request $request)
 {
     $user = $request->user();
 
+    if ($request->has('phone') && $request->phone !== $user->phone) {
+        if (User::where('phone', $request->phone)->exists()) {
+            $statusCode = 422;
+            return response()->json(['message' => 'The phone number is already taken.', 
+                                '$status_code'=>$statusCode], $statusCode);
+        }
+    }
+
     $request->validate([
-        'phone' => 'nullable|unique:users,phone,' . $user->id,
-        'first_name' => 'nullable|string',
+        $request->validate([
+            'phone' => [
+                'nullable',
+                'unique:users,phone,' . $user->id,
+                'regex:/^\+?[0-9]{8,11}$/'  
+            ],
+        ]),
+       'first_name' => 'nullable|string',
         'last_name' => 'nullable|string',
         'user_type' => 'nullable|string',
         'location' => 'nullable|string',
@@ -83,12 +110,16 @@ public function update(Request $request)
         }
 
         $profilePhoto = $request->file('profile_photo')->store('profile_photos', 'public');
-    } 
+    }
 
-    $user->update($request->only(['phone', 'first_name', 'last_name', 'user_type', 'location']) + ['profile_photo' => $profilePhoto]);
+    $user->update(
+        $request->only(['phone', 'first_name', 'last_name', 'user_type', 'location']) +
+        ['profile_photo' => $profilePhoto]
+    );
 
     return response()->json($user);
 }
+
 
     public function destroy(Request $request)
 {

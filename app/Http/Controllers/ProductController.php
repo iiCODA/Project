@@ -21,7 +21,7 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'quantity' => 'required|integer|min:1',
             'price' => 'required|numeric|min:0',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', 
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5000', 
         ]);
     
         $shop = $request->user()->shop;
@@ -102,9 +102,6 @@ class ProductController extends Controller
     
 
 
-
-
-
     public function destroy(Request $request, $id)
     {
     $product = Product::find($id);
@@ -121,6 +118,10 @@ class ProductController extends Controller
         '$status_code'=>$statusCode], $statusCode);
     }
 
+    if ($product->photo) {
+        Storage::disk('public')->delete($product->photo);
+    }
+
     $product->delete();
 
     return response()->json(['message' => 'Product deleted successfully']);
@@ -133,7 +134,7 @@ public function show($id)
     if (!$product) {
         $statusCode = 404;
         return response()->json(['message' => 'Product not found',
-        '$status_code'=>$statusCode], $statusCode);
+        'status_code'=>$statusCode], $statusCode);
     }
 
     $product->photo_url = $product->photo ? asset('storage/' . $product->photo) : null;

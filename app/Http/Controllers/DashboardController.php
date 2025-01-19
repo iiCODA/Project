@@ -24,9 +24,9 @@ class DashboardController extends Controller
         }
     
         if ($user->user_type !== 'owner') {
-            return response()->json([
-                'message' => 'You do not have permission to access this page.',
-           , 'status_code'=>$statusCode], $statusCode);
+            $statusCode = 403;
+            return response()->json(['message' => 'You do not have permission to access this page.',
+            '$status_code'=>$statusCode], $statusCode);
         }
 
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -40,16 +40,16 @@ class DashboardController extends Controller
     
     public function logout(Request $request)
     {
-        $request->user()->tokens()->delete();
-    
-        return response()->json(['message' => 'Logged out successfully.'], 200);
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json(['message' => 'Logout successful']);
     }
     
     
     public function promote(Request $request)
     {
         $request->validate([
-            'phone' => 'required|numeric',
+            'phone' => 'required',
         ]);
     
         $user = User::where('phone', $request->phone)->first();
@@ -60,10 +60,15 @@ class DashboardController extends Controller
                                     'status_code'=>$statusCode], $statusCode);
         }
     
+        if($user->user_type == 'admin'){
+            return response()->json (['message'=> 'User is Already an Admin!.']);
+
+        }
+
         $user->user_type = 'admin';
         $user->save();
     
-        return response()->json (['message', 'User has been promoted to Admin Successfully.']);
+        return response()->json (['message'=> 'User has been promoted to Admin Successfully.']);
     }
     
     
@@ -78,10 +83,15 @@ class DashboardController extends Controller
                                     'status_code'=>$statusCode], $statusCode);
         }
     
+
+        if($user->user_type == 'user'){
+            return response()->json (['message'=> 'The Type of the User is Already a user! he is not an Admin.']);
+        }
+
         $user->user_type = 'user';
         $user->save();
 
-        return response()->json (['message', 'User has been promoted to Admin Successfully.']);
+        return response()->json (['message'=> 'User has been unpromoted to user type Successfully.']);
     }
     
     

@@ -11,6 +11,16 @@ use Illuminate\Support\Facades\Storage;
 class ShopController extends Controller
 {
    
+    public function show(Request $request)
+    {
+        $shop = $request->user()->shop;
+        if (!$shop) {
+            return response()->json(['message' => 'Shop not found'], 404);
+        }
+        return response()->json($shop);
+    }
+
+
     public function store(Request $request)
     {
         $request->validate([
@@ -23,7 +33,8 @@ class ShopController extends Controller
 
         if ($user->shop) {
             $statusCode = 400;
-            return response()->json(['message' => 'User already has a shop', 'status_code' => $statusCode], $statusCode);
+            return response()->json(['message' => 'User already has a shop',
+                                     'status_code' => $statusCode], $statusCode);
         }
 
         $data = $request->only(['name', 'location']);

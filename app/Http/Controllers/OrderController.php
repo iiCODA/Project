@@ -13,6 +13,18 @@ use App\Jobs\UpdateOrderStatus;
 class OrderController extends Controller
 {
 
+    public function index(Request $request)
+    {
+        $user = $request->user();
+        $orders = Order::with('orderItems.product')->where('user_id', $user->id)->get();
+
+        if ($orders->isEmpty()) {
+            return response()->json(['message' => 'No orders found'], 404);
+        }
+
+        return response()->json($orders);
+    }
+
     public function createOrder(Request $request)
     {
         $user = $request->user();
@@ -36,7 +48,6 @@ class OrderController extends Controller
             'status' => 'pending',
         ]);
     
-        // Dispatch the status update job
         UpdateOrderStatus::dispatch($order)->delay(now()->addMinute());
 
         OrderItem::create([
@@ -85,11 +96,10 @@ class OrderController extends Controller
 
         $order = Order::create([
             'user_id' => $user->id,
-            'total_price' => $totalPrice,
+            'total_price' => (string)$totalPrice,
             'status' => 'pending',
         ]);
     
-        // Dispatch the status update job
         UpdateOrderStatus::dispatch($order)->delay(now()->addMinute());
 
         foreach ($cartItems as $cartItem) {
@@ -113,18 +123,6 @@ class OrderController extends Controller
             'order' => $order,
             'order_items' => $order->orderItems,
         ]);
-    }
-
-    public function index(Request $request)
-    {
-        $user = $request->user();
-        $orders = Order::with('orderItems.product')->where('user_id', $user->id)->get();
-
-        if ($orders->isEmpty()) {
-            return response()->json(['message' => 'No orders found'], 404);
-        }
-
-        return response()->json($orders);
     }
 
 
@@ -151,6 +149,8 @@ class OrderController extends Controller
         return response()->json(['message' => 'Order deleted successfully, and product stock restored.']);
     }
 
+
+    
     public function updateOrder(Request $request, $orderId)
     {
         $user = $request->user();
@@ -207,7 +207,7 @@ class OrderController extends Controller
             }
         }
 
-        $order->update(['total_price' => $totalPrice]);
+        $order->update(['total_price' => (string)$totalPrice]);
         $user->notify(new OrderNotification('updated', $order));
 
         return response()->json(['message' => 'Order updated successfully', 'order' => $order->load('orderItems.product')]);
