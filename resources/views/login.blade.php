@@ -5,79 +5,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <style>
-        body {
-            background: linear-gradient(135deg, #1f1c2c, #928dab);
-            color: #fff;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: 'Arial', sans-serif;
-        }
-
-        .card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .card h3 {
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-
-        .form-control {
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            border-radius: 8px;
-            color: #fff;
-            padding: 10px;
-        }
-
-        .form-control:focus {
-            background: rgba(255, 255, 255, 0.3);
-            box-shadow: none;
-            border: 1px solid #007bff;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #007bff, #0056b3);
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-        }
-
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #0056b3, #003d80);
-        }
-
-        .alert {
-            background: rgba(255, 0, 0, 0.2);
-            border-radius: 8px;
-            color: #ffcccc;
-            font-weight: bold;
-        }
-    </style>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body>
-    <div class="card p-4" style="width: 400px;">
-        <h3 class="text-center">Login</h3>
-        <form action="{{ route('login.post') }}" method="POST">
-            @csrf
-            <div class="mb-3">
-                <label for="phone" class="form-label">Phone Number</label>
-                <input type="text" name="phone" id="phone" class="form-control"
-                    placeholder="Enter your phone number" required>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <!-- Login Card -->
+    <div class="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
+        <!-- Title -->
+        <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">Welcome Back</h1>
+
+        <!-- Display Errors -->
+        @if ($errors->any())
+            <div class="bg-red-100 text-red-700 border border-red-200 p-4 rounded-lg mb-4">
+                <ul class="list-disc list-inside">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
             </div>
-            @if (session('error'))
-                <div class="alert alert-danger">{{ session('error') }}</div>
-            @endif
-            <button type="submit" class="btn btn-primary w-100">Login</button>
+        @endif
+
+        <!-- Login Form -->
+        <form action="{{ route('wlogin') }}" method="POST" class="space-y-6">
+            @csrf
+            <!-- Phone Input -->
+            <div>
+                <label for="phone" class="block text-gray-700 font-medium mb-2">Phone Number</label>
+                <input type="text" name="phone" id="phone" required
+                    class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <!-- Login Button -->
+            <button type="submit"
+                class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow transition duration-200 transform hover:scale-105">
+                Login
+            </button>
         </form>
     </div>
 </body>
