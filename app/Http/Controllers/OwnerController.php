@@ -51,8 +51,9 @@ class OwnerController extends Controller
     {
         $admins = User::where('user_type', 'admin')->get();
         $users = User::where('user_type', 'user')->get();
+        $deletedUsers = User::onlyTrashed()->get();
 
-        return view('owner.user-management', compact('admins', 'users'));
+        return view('owner.user-management', compact('admins', 'users', 'deletedUsers'));
     }
 
 
