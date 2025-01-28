@@ -8,21 +8,22 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
-        */
-        public function up(): void
-        {
-            Schema::create('users', function (Blueprint $table) {
-                $table->id();
-                $table->string('phone')->unique();
-                $table->string('first_name')->nullable();
-                $table->string('last_name')->nullable();
-                $table->string('user_type')->default('user');
-                $table->string('location')->nullable();  
-                $table->string('profile_photo')->nullable();  
-                $table->timestamps();
-            });
-        }
-        
+     */
+    public function up(): void
+    {
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('phone')->unique();
+            $table->string('first_name')->nullable();
+            $table->string('last_name')->nullable();
+            $table->string('user_type')->default('user');
+            $table->string('location')->nullable();
+            $table->string('profile_photo')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
+        });
+    }
+
 
     /**
      * Reverse the migrations.
