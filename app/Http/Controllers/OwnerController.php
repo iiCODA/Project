@@ -49,11 +49,12 @@ class OwnerController extends Controller
 
     public function userManagement()
     {
-        $admins = User::where('user_type', 'admin')->get();
-        $users = User::where('user_type', 'user')->get();
-        $deletedUsers = User::onlyTrashed()->get();
+        $admins = User::where('user_type', 'admin')->whereNull('deleted_at')->get();
+        $users = User::where('user_type', 'user')->whereNull('deleted_at')->get();
+        $blockedAdmins = User::onlyTrashed()->where('user_type', 'admin')->get();
+        $blockedUsers = User::onlyTrashed()->where('user_type', 'user')->get();
 
-        return view('owner.user-management', compact('admins', 'users', 'deletedUsers'));
+        return view('owner.user-management', compact('admins', 'users', 'blockedAdmins', 'blockedUsers'));
     }
 
 
@@ -102,26 +103,28 @@ class OwnerController extends Controller
 
     public function block(Request $request)
     {
-        // Validate the request
         $request->validate([
-            'id' => 'required|exists:users,id', // Ensure the user exists
+            'id' => 'required|exists:users,id',
         ]);
 
-        $user = User::find($request->id);
+        $user = User::withTrashed()->find($request->id);
 
         if (!$user) {
             return redirect()->back()->with('error', 'User not found.');
         }
 
-        try {
-            // Soft delete the user
-            $user->delete();
+        if ($user->trashed()) {
+            return redirect()->back()->with('error', 'User is already blocked.');
+        }
 
+        try {
+            $user->delete();
             return redirect()->back()->with('success', 'User has been successfully blocked.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'An error occurred while blocking the user.');
         }
     }
+
 
     public function restore(Request $request)
     {
