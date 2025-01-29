@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Auth;
 // Admin Authentication and Dashboard
 Route::get('/login', [WebUserController::class, 'create'])->name('login');
 Route::post('/login', [WebUserController::class, 'login'])->name('wlogin');
-Route::post('/logout', [WebUserController::class, 'logout'])->middleware('auth:web')->name('logout');
+Route::post('/logout', [WebUserController::class, 'logout'])->middleware('auth')->name('logout');
 
 // Admin Dashboard
 Route::middleware(['auth:web'])->group(function () {
