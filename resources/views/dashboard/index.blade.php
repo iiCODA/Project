@@ -7,6 +7,8 @@
     <title>Admin Dashboard</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script>
         // JavaScript for tab switching
         function switchTab(tabId) {
@@ -14,8 +16,9 @@
             document.getElementById(tabId).classList.remove('hidden');
 
             // Highlight the active tab in the sidebar
-            document.querySelectorAll('.tab-link').forEach(link => link.classList.remove('bg-gray-700', 'font-bold'));
-            document.querySelector(`[data-tab="${tabId}"]`).classList.add('bg-gray-700', 'font-bold');
+            document.querySelectorAll('.tab-link').forEach(link => link.classList.remove('bg-blue-700', 'text-white',
+                'font-bold'));
+            document.querySelector(`[data-tab="${tabId}"]`).classList.add('bg-blue-700', 'text-white', 'font-bold');
         }
 
         // Default to the "My Shop" tab on page load
@@ -28,39 +31,41 @@
 <body class="bg-gray-100 text-gray-800">
     <div class="flex min-h-screen">
         <!-- Sidebar with Vertical Tabs -->
-        <aside class="w-64 bg-gray-800 text-white flex flex-col p-5">
-            <h2 class="text-2xl font-bold mb-8 text-center">Admin Dashboard</h2>
-            <nav class="space-y-4">
+        <aside class="w-64 bg-gray-800 text-white flex flex-col p-5 shadow-lg">
+            <h2 class="text-2xl font-bold mb-8 text-center text-blue-400">Admin Dashboard</h2>
+            <nav class="space-y-2">
                 <button data-tab="my-shop-tab"
-                    class="tab-link block py-2 px-4 rounded hover:bg-gray-700 bg-gray-700 font-bold"
+                    class="tab-link w-full text-left py-3 px-4 rounded-lg hover:bg-blue-700 hover:text-white transition duration-300 bg-blue-700 text-white font-bold"
                     onclick="switchTab('my-shop-tab')">
-                    My Shop
+                    <i class="fas fa-store mr-2"></i> My Shop
                 </button>
-                <button data-tab="my-products-tab" class="tab-link block py-2 px-4 rounded hover:bg-gray-700"
+                <button data-tab="my-products-tab"
+                    class="tab-link w-full text-left py-3 px-4 rounded-lg hover:bg-blue-700 hover:text-white transition duration-300"
                     onclick="switchTab('my-products-tab')">
-                    My Products
+                    <i class="fas fa-boxes mr-2"></i> My Products
                 </button>
             </nav>
             <form action="{{ route('logout') }}" method="POST" class="mt-auto">
                 @csrf
-                <button class="w-full py-2 px-4 mt-8 bg-red-600 hover:bg-red-700 rounded text-white font-semibold">
-                    Logout
+                <button
+                    class="w-full py-3 px-4 mt-8 bg-red-600 hover:bg-red-700 rounded-lg text-white font-semibold transition duration-300 transform hover:scale-105">
+                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
                 </button>
             </form>
         </aside>
 
         <!-- Main Content -->
         <main class="flex-1 p-8">
-            <h1 class="text-3xl font-bold mb-6">Welcome to Your Dashboard</h1>
+            <h1 class="text-3xl font-bold mb-6 text-gray-800">Welcome to Your Dashboard</h1>
 
             <!-- Success/Error Messages -->
             @if (session('success'))
-                <div class="bg-green-100 text-green-800 border border-green-200 rounded p-4 mb-6">
+                <div class="bg-green-100 text-green-800 border border-green-200 rounded-lg p-4 mb-6">
                     {{ session('success') }}
                 </div>
             @endif
             @if ($errors->any())
-                <div class="bg-red-100 text-red-800 border border-red-200 rounded p-4 mb-6">
+                <div class="bg-red-100 text-red-800 border border-red-200 rounded-lg p-4 mb-6">
                     @foreach ($errors->all() as $error)
                         <p>{{ $error }}</p>
                     @endforeach
@@ -73,7 +78,7 @@
                     <!-- Shop Details Section -->
                     <div class="bg-white shadow-lg rounded-lg overflow-hidden">
                         <!-- Header Section -->
-                        <div class="bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 p-8 text-white">
+                        <div class="bg-gradient-to-r from-blue-600 to-blue-700 p-8 text-white">
                             <div class="flex items-center">
                                 <!-- Shop Photo -->
                                 @if (Auth::user()->shop->shop_photo)
@@ -156,45 +161,50 @@
                 @endif
             </section>
 
-
             <!-- My Products Tab -->
             <section id="my-products-tab" class="tab-content hidden">
                 @if (Auth::user()->shop)
-                    <section class="bg-white shadow rounded-lg p-6 mb-8">
+                    <section class="bg-white shadow-lg rounded-lg p-6 mb-8">
                         <h2 class="text-xl font-semibold mb-4">Add Product</h2>
                         <form action="{{ route('product.store') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <div class="mb-4">
                                 <label for="product-name" class="block font-medium">Product Name:</label>
-                                <input type="text" id="product-name" name="name" class="w-full p-2 border rounded"
+                                <input type="text" id="product-name" name="name"
+                                    class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
                                     placeholder="Enter product name" required>
                             </div>
                             <div class="mb-4">
                                 <label for="product-description" class="block font-medium">Description:</label>
-                                <textarea id="product-description" name="description" class="w-full p-2 border rounded"
+                                <textarea id="product-description" name="description"
+                                    class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
                                     placeholder="Enter product description"></textarea>
                             </div>
                             <div class="mb-4">
                                 <label for="product-quantity" class="block font-medium">Quantity:</label>
                                 <input type="number" id="product-quantity" name="quantity"
-                                    class="w-full p-2 border rounded" min="1" required>
+                                    class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                    min="1" required>
                             </div>
                             <div class="mb-4">
                                 <label for="product-price" class="block font-medium">Price:</label>
                                 <input type="number" id="product-price" name="price"
-                                    class="w-full p-2 border rounded" min="0" step="0.01" required>
+                                    class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                    min="0" step="0.01" required>
                             </div>
                             <div class="mb-4">
                                 <label for="product-photo" class="block font-medium">Photo:</label>
                                 <input type="file" id="product-photo" name="photo"
-                                    class="w-full p-2 border rounded">
+                                    class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
                             </div>
-                            <button class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded">Add
-                                Product</button>
+                            <button
+                                class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg shadow transition duration-200 transform hover:scale-105">
+                                Add Product
+                            </button>
                         </form>
                     </section>
 
-                    <section class="bg-white shadow rounded-lg p-6">
+                    <section class="bg-white shadow-lg rounded-lg p-6">
                         <h2 class="text-xl font-semibold mb-4">Products</h2>
                         <table class="table-auto w-full border-collapse border border-gray-200">
                             <thead>
@@ -209,7 +219,7 @@
                             </thead>
                             <tbody>
                                 @foreach (Auth::user()->shop->products as $product)
-                                    <tr>
+                                    <tr class="hover:bg-gray-50 transition duration-200">
                                         <td class="border px-4 py-2">{{ $product->name }}</td>
                                         <td class="border px-4 py-2">${{ number_format($product->price, 2) }}</td>
                                         <td class="border px-4 py-2">{{ $product->quantity }}</td>
@@ -217,19 +227,25 @@
                                         <td class="border px-4 py-2">
                                             @if ($product->photo)
                                                 <img src="{{ asset('storage/' . $product->photo) }}"
-                                                    alt="Product Photo" class="w-16 h-16 rounded">
+                                                    alt="Product Photo" class="w-16 h-16 rounded-lg">
                                             @endif
                                         </td>
                                         <td class="border px-4 py-2">
-                                            <a href="{{ route('product.edit', $product->id) }}"
-                                                class="bg-blue-600 hover:bg-blue-700 text-white py-1 px-2 rounded">Edit</a>
-                                            <form action="{{ route('product.destroy', $product->id) }}"
-                                                method="POST" onsubmit="return confirm('Are you sure?')"
-                                                class="inline-block">
-                                                @csrf
-                                                <button type="submit"
-                                                    class="bg-red-600 hover:bg-red-700 text-white py-1 px-2 rounded">Delete</button>
-                                            </form>
+                                            <div class="flex space-x-2">
+                                                <a href="{{ route('product.edit', $product->id) }}"
+                                                    class="bg-blue-500 hover:bg-blue-600 text-white py-1 px-2 rounded-lg transition duration-200 transform hover:scale-105">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <form action="{{ route('product.destroy', $product->id) }}"
+                                                    method="POST" onsubmit="return confirm('Are you sure?')"
+                                                    class="inline-block">
+                                                    @csrf
+                                                    <button type="submit"
+                                                        class="bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded-lg transition duration-200 transform hover:scale-105">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
                                         </td>
                                     </tr>
                                 @endforeach
